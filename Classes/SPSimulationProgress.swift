@@ -47,6 +47,7 @@ public class SPSimulationProgress: NSObject, SPSimulationProgressDelegate, UITab
             return
         }
         isFinish = false
+        delegate?.didChangeValue(self, 0)
         progressTimer = Timer.scheduledTimer(timeInterval: TimeInterval(progressDuration), target: self, selector: #selector(progressTimerAction), userInfo: nil, repeats: true)
         RunLoop.current.add(progressTimer!, forMode: .common)
     }
@@ -98,7 +99,6 @@ extension SPSimulationProgress {
     
     private func currentPercent() -> Int {
         let value = arc4random_uniform(UInt32(limitValue.max - limitValue.min + 1)) + UInt32(limitValue.min)
-        print("++ \(value)")
         percent += Int(value)
         return min(percent, 100)
     }
