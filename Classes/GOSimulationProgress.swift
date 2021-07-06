@@ -1,27 +1,20 @@
 //
-//  SPSimulationProgress.swift
-//  SPSimulationProgress
+//  GOSimulationProgress.swift
+//  GOSimulationProgress
 //
 //  Created by 高文立 on 2020/7/27.
-//  Copyright © 2020 mouos. All rights reserved.
 //
 
 import UIKit
 
-public protocol SPSimulationProgressDelegate: NSObjectProtocol {
-    
-    func didChangeValue(_ objc: AnyObject, _ value: Int)
-    func didFinish(_ objc: AnyObject)
+@objc public protocol GOSimulationProgressDelegate: NSObjectProtocol {
+    @objc optional func didChangeValue(_ objc: AnyObject, _ value: Int)
+    @objc optional func didFinish(_ objc: AnyObject)
 }
 
-public extension SPSimulationProgressDelegate {
-    func didChangeValue(_ objc: AnyObject, _ value: Int) {}
-    func didFinish(_ objc: AnyObject) {}
-}
-
-public class SPSimulationProgress: NSObject, SPSimulationProgressDelegate, UITableViewDelegate {
+@objcMembers public class GOSimulationProgress: NSObject, GOSimulationProgressDelegate, UITableViewDelegate {
     
-    weak open var delegate: SPSimulationProgressDelegate?
+    weak open var delegate: GOSimulationProgressDelegate?
     
     private var maxValue = 90
     private var limitValue = (min: 1, max: 5)
@@ -47,7 +40,7 @@ public class SPSimulationProgress: NSObject, SPSimulationProgressDelegate, UITab
             return
         }
         isFinish = false
-        delegate?.didChangeValue(self, 0)
+        delegate?.didChangeValue?(self, 0)
         progressTimer = Timer.scheduledTimer(timeInterval: TimeInterval(progressDuration), target: self, selector: #selector(progressTimerAction), userInfo: nil, repeats: true)
         RunLoop.current.add(progressTimer!, forMode: .common)
     }
@@ -62,18 +55,18 @@ public class SPSimulationProgress: NSObject, SPSimulationProgressDelegate, UITab
     }
 }
 
-extension SPSimulationProgress {
+extension GOSimulationProgress {
     
     @objc func progressTimerAction() {
         percent = currentPercent()
-        delegate?.didChangeValue(self, percent)
+        delegate?.didChangeValue?(self, percent)
         
         if isAuto {
             if percent >= 100 {
                 progressTimer?.invalidate()
                 finishLink?.invalidate()
                 percent = 0
-                delegate?.didFinish(self)
+                delegate?.didFinish?(self)
                 isFinish = true
             }
         } else {
@@ -89,11 +82,11 @@ extension SPSimulationProgress {
             progressTimer?.invalidate()
             finishLink?.invalidate()
             percent = 0
-            delegate?.didFinish(self)
+            delegate?.didFinish?(self)
             isFinish = true
         } else {
             percent = currentPercent()
-            delegate?.didChangeValue(self, percent)
+            delegate?.didChangeValue?(self, percent)
         }
     }
     
